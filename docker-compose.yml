@@ -11,16 +11,19 @@ services:
       - POSTGRESQL_DATABASE=bitnami_keycloak
     volumes:
       - "postgresql_data:/bitnami/postgresql"
+    networks:
+      - backend 
 
   keycloak-1:
     image: docker.io/bitnami/keycloak:latest
     container_name: keycloak-1
     ports:
-      - "80:8080"
+      - "8090:8080"
     # volumes:
     # - ./standalone1-ha.xml:/bitnami/keycloak/configuration/standalone-ha.xml:ro
     environment:
       - KEYCLOAK_CREATE_ADMIN_USER=true
+      - KEYCLOAK_FRONTEND_URL=https://test222.wg0.io/auth
       - KEYCLOAK_USER=admin
       - KEYCLOAK_PASSWORD=admin
       - KEYCLOAK_JGROUPS_DISCOVERY_PROTOCOL=JDBC_PING
@@ -29,7 +32,8 @@ services:
       - KEYCLOAK_AUTH_CACHE_OWNERS_COUNT=3
     depends_on:
       - postgresql
-
+    networks:
+      - backend 
   # keycloak-2:
   #   container_name: keycloak-3
   #   image: docker.io/bitnami/keycloak:latest
@@ -68,6 +72,8 @@ services:
     - db_data:/var/lib/postgresql/data
     environment:
       POSTGRES_PASSWORD: postgrespassword
+    networks:
+      - backend 
 
   pgadmin:
     container_name: pgadmin
@@ -81,6 +87,8 @@ services:
     environment:
       PGADMIN_DEFAULT_EMAIL: pgadmin@example.com
       PGADMIN_DEFAULT_PASSWORD: admin
+    networks:
+      - backend 
 
   graphql-engine:
     image: hasura/graphql-engine:v2.5.1
@@ -104,11 +112,17 @@ services:
       ## uncomment next line to set an admin secret
       # HASURA_GRAPHQL_ADMIN_SECRET: myadminsecretkey
       HASURA_GRAPHQL_ADMIN_SECRET: myadminsecretkey
-      HASURA_GRAPHQL_JWT_SECRET: '{"jwk_url": "http://keycloak-1:8080/auth/realms/master/protocol/openid-connect/certs","type": "HS256"}'
-
+    networks:
+      - backend 
   
 volumes:
   postgresql_data:
     driver: local
   db_data:
     driver: local
+
+networks:
+    default: # this network (app1)
+        driver: bridge
+    backend: # external network (app2)
+        external: true

@@ -18,7 +18,7 @@ services:
     image: docker.io/bitnami/keycloak:latest
     container_name: keycloak-1
     ports:
-      - "8090:8080"
+      - "127.0.0.1:8090:8080"
     # volumes:
     # - ./standalone1-ha.xml:/bitnami/keycloak/configuration/standalone-ha.xml:ro
     environment:
@@ -82,7 +82,7 @@ services:
     depends_on:
     - postgres
     ports:
-    - 5050:80
+    - "127.0.0.1:8091:80"
     ## you can change pgAdmin default username/password with below environment variables
     environment:
       PGADMIN_DEFAULT_EMAIL: pgadmin@example.com
@@ -94,7 +94,7 @@ services:
     image: hasura/graphql-engine:v2.5.1
     container_name: graphql-engine
     ports:
-    - "8080:8080"
+    - "127.0.0.1:8092:8080"
     depends_on:
     - "postgres"
     - "keycloak-1"
